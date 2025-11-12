@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  menaapp:
+    image: menaimg:latest
+    deploy:
+      replicas: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.menaapp.entrypoints=http"
+      - "traefik.http.routers.menaapp.rule=Host(`menaapp.byronrm.com`)"
+      - "traefik.http.middlewares.menaapp-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.menaapp.middlewares=menaapp-https-redirect"
+      - "traefik.http.routers.menaapp-secure.entrypoints=https"
+      - "traefik.http.routers.menaapp-secure.rule=Host(`menaapp.byronrm.com`)"
+      - "traefik.http.routers.menaapp-secure.tls=true"
+      - "traefik.http.routers.menaapp-secure.tls.certresolver=http"
+      - "traefik.http.routers.menaapp-secure.service=menaapp"
+      - "traefik.http.services.menaapp.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik-public"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
